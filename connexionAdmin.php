@@ -13,27 +13,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = $_POST['username'];
     $password = $_POST['password'];
 
-
-    $stmt = $c->prepare("SELECT * FROM usersadmin WHERE username = adminTDW AND password = 123admin");
-    $stmt->bindParam("ss", $username, $password); // ss veut dire username = string et password is a string 
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    if ($result->num_rows === 1) {
-        header('Location: 7thObjective.pgp');
-        exit;
-    } else {
-        echo "Nom d'utilisateur ou mot de passe incorrect. Veuillez réessayer.";
-    }
-
-   
-   /* if ($username === 'adminTDW' && $password === '123admin') { // Sans recuperation de la base de donnees
+    if ($username === 'adminTDW' && $password === '123admin') { // Sans recuperation de la base de donnees
        
         header('Location: 7thObjective.php');
         exit;
     } else {
         echo "Nom d'utilisateur ou mot de passe incorrect! Veuillez Ressayer";
-    }*/
+    }
 }
 ?>
 <!DOCTYPE html>
