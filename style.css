@@ -1,0 +1,89 @@
+table thead {
+    background-color: lightgrey;
+   
+}
+table th{
+    background-color: lightgray;
+}
+table{
+    border-style: dotted;
+}
+table tr:nth-child(2n){
+    background-color: lightgoldenrodyellow;
+}
+table tr:nth-child(2n+1){
+    background-color: lightblue;
+}
+h2#titre{
+    font-size: large;
+    font-weight: bold;
+    font-style: italic; 
+    font-family: fantaisie;   
+} 
+.menu ul {
+   display: flex;
+
+  list-style: none;
+  justify-content: space-around;
+  margin: 10;
+  height: 2000;
+  
+}
+.menu{
+  position: sticky;
+  list-style: none;
+  margin: none;
+  text-align: center;
+  background-color: pink;
+}
+.menu li{
+  margin: 0;
+}
+
+.menu ul li:hover ul{
+  display:bock;
+}
+.conteneur{
+  
+  height: 400px; 
+  width: 400px; 
+  position: relative;
+  
+}
+.conteneur div{
+  position: absolute;
+}
+.animation-image {
+    animation-name: anismartphones;
+    animation-duration: 3s;
+    height: 100%; 
+ 
+  animation-iteration-count: infinite; 
+  }
+
+@keyframes anismartphones {
+  0%{
+    opacity: 1;
+    content: url('./samsung.jpg');
+  }
+  25%{
+    opacity: 1;
+    content:  url('./iphone.jpg');
+  }
+  50%{
+    opacity: 1;
+    content: url('./huawei.jpeg');
+  }
+  75%{
+    opacity: 1;
+    content:  url('./xioami.jpg');
+  }
+  100%{
+    opacity: 0;
+    content: none;
+  }
+}
+
+.animation-image:hover{
+  animation-play-state: paused;
+}
