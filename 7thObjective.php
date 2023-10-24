@@ -63,53 +63,75 @@
 </tbody>
         </table>
     <!-- Insérez ici le code HTML pour l'interface de l'administrateur pour ajouter un smartphone ou une caractéristique -->
-    <form method="post">
-        <label for="feature">Feature:</label><br>
-        <input type="text" id="feature" name="feature"><br><br>
-        <label for="huawei">Huawei:</label><br>
-        <input type="text" id="huawei" name="huawei"><br><br>
-        <label for="samsung">Samsung:</label><br>
-        <input type="text" id="samsung" name="samsung"><br><br>
-        <label for="apple">Apple:</label><br>
-        <input type="text" id="apple" name="apple"><br><br>
-        <label for="xiaomi">Xiaomi:</label><br>
-        <input type="text" id="xiaomi" name="xiaomi"><br><br>
-        <input type="submit" value="Add Smartphone">
-    </form>
+    
 </body>
-</html>
-<?php
+</html><?php
 session_start();
-$dsn="mysql:dbname=tpsmartphone; host=127.0.0.1;";
-try{
-$c=new PDO($dsn,"root","");
+$dsn = "mysql:dbname=tpsmartphone; host=127.0.0.1;";
+try {
+    $c = new PDO($dsn, "root", "");
+    $c->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $ex) {
+    printf("erreur de connexion à la base de donnée", $ex->getMessage());
+    exit();
 }
-catch(PDOException $ex){
-printf("erreur de connexion à la base de donnée", $ex->getMessage());
-exit();
+echo '<form method="post">';
+echo '<label for="feature">Feature:</label>
+<input type="text" id="feature" name="feature"><br><br>';
+$feature = $_POST['feature'];
+$qtf="SELECT * FROM smartphone";
+/*foreach($c->query($qtf) as $row){    
+echo '<label>'.$row["Name_smartphone"].'</label>';
+echo '<input type="text" id="feature" name="feature"><br><br>';
+echo '</form>';
+}*/
+foreach($c->query($qtf) as $row) {
+    $smartphoneId = $row["Id_smartphone"];
+    echo '<form>';
+    echo '<label for="feature_'.$smartphoneId.'">'.$row["Name_smartphone"].'</label>';
+    echo '<input type="text" id="feature_'.$smartphoneId.'" name="feature_'.$smartphoneId.'"><br><br>';
+    echo '</form>';
+    if(isset($_POST['feature_'.$smartphoneId])) {
+        $features[$smartphoneId] = $_POST['feature_'.$smartphoneId];
+    }
+
 }
-// Vérifier si le formulaire d'ajout de smartphone a été soumis
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Assurez-vous de valider et d'échapper les données appropriées pour éviter les attaques par injection SQL
-    $feature = $_POST['feature'];
-    $huawei = $_POST['huawei'];
-    $samsung = $_POST['samsung'];
-    $apple = $_POST['apple'];
-    $xiaomi = $_POST['xiaomi'];
 
-    // Préparer et exécuter la requête d'insertion
-    $stmt = $conn->prepare("INSERT INTO smartphones (feature, huawei, samsung, apple, xiaomi) VALUES (?, ?, ?, ?, ?)");
-    $stmt->bind_param("sssss", $feature, $huawei, $samsung, $apple, $xiaomi);
-    $stmt->execute();
 
-    // Rediriger l'administrateur vers la même page pour afficher les mises à jour
-    header('Location: 7thObjective.php');
-    exit;
+
+$stmt = $c->prepare("INSERT INTO features (Name_Features) VALUES (?)");
+$stmt->bindParam(1, $feature);
+$stmt->execute();
+$feature_id = $c->lastInsertId();
+
+
+$sqlr = "SELECT COUNT(*) as total FROM smartphone";
+$result = $c->query($sqlr);
+$row = $result->fetch(PDO::FETCH_ASSOC);
+
+$smartphoneCount = $row['total'];
+$sqlSmartphones = "SELECT * FROM smartphone";
+$smartphoneResult = $c->query($sqlSmartphones);
+$features = [];
+while ($smartphone = $smartphoneResult->fetch(PDO::FETCH_ASSOC)) {
+    $smartphoneId = $smartphone['Id_smartphone'];
+
+    if (array_key_exists($smartphoneId, $features)) {
+        $valueSmartphoneFeatures = $features[$smartphoneId];
+        $idSmartphone = $smartphone['Id_smartphone'];
+
+        $sqlInsert = "INSERT INTO smartphone_features (Value_Smartphone_Features, Id_smartphone, Id_Features) 
+            VALUES (:valueSmartphoneFeatures, :idSmartphone, :idFeatures)";
+
+        $stmt = $c->prepare($sqlInsert);
+        $stmt->bindParam(':valueSmartphoneFeatures', $valueSmartphoneFeatures);
+        $stmt->bindParam(':idSmartphone', $idSmartphone);
+        $stmt->bindParam(':idFeatures', $feature_id); 
+
+        $stmt->execute();
+    }
 }
 
-// Fermer la connexion à la base de données
-$conn->close();
+
+
 ?>
-
-
-
