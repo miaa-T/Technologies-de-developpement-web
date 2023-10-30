@@ -61,9 +61,7 @@
     <td>No</td>
 </tr>
 </tbody>
-        </table>
-    <!-- Insérez ici le code HTML pour l'interface de l'administrateur pour ajouter un smartphone ou une caractéristique -->
-    
+        </table>    
 </body>
 </html><?php
 session_start();
@@ -75,62 +73,67 @@ try {
     printf("erreur de connexion à la base de donnée", $ex->getMessage());
     exit();
 }
-echo '<form method="post">';
+echo '<form method="POST">';
 echo '<label for="feature">Feature:</label>
-<input type="text" id="feature" name="feature"><br><br>';
-$feature = $_POST['feature'];
+<input type="text" id="feature" name="feature" /><br><br>';
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $feature =  $_POST['feature'];
+    
+}
 $qtf="SELECT * FROM smartphone";
-/*foreach($c->query($qtf) as $row){    
-echo '<label>'.$row["Name_smartphone"].'</label>';
-echo '<input type="text" id="feature" name="feature"><br><br>';
-echo '</form>';
-}*/
+
+$features = [];
+
 foreach($c->query($qtf) as $row) {
     $smartphoneId = $row["Id_smartphone"];
-    echo '<form>';
     echo '<label for="feature_'.$smartphoneId.'">'.$row["Name_smartphone"].'</label>';
     echo '<input type="text" id="feature_'.$smartphoneId.'" name="feature_'.$smartphoneId.'"><br><br>';
-    echo '</form>';
+    
     if(isset($_POST['feature_'.$smartphoneId])) {
         $features[$smartphoneId] = $_POST['feature_'.$smartphoneId];
     }
-
 }
+if ($_SERVER["REQUEST_METHOD"] == "POST"){
+    $stmt = $c->prepare("INSERT INTO features (Name_Features) VALUES (?)");
+    $stmt->bindParam(1, $feature);
+    $stmt->execute();
+    $feature_id = $c->lastInsertId();
+    
+    $sqlr = "SELECT COUNT(*) as total FROM smartphone";
+    $result = $c->query($sqlr);
+    $row = $result->fetch(PDO::FETCH_ASSOC);
+    $smartphoneCount = $row['total'];
+    
+    
 
-
-
-$stmt = $c->prepare("INSERT INTO features (Name_Features) VALUES (?)");
-$stmt->bindParam(1, $feature);
-$stmt->execute();
-$feature_id = $c->lastInsertId();
-
-
-$sqlr = "SELECT COUNT(*) as total FROM smartphone";
-$result = $c->query($sqlr);
-$row = $result->fetch(PDO::FETCH_ASSOC);
-
-$smartphoneCount = $row['total'];
-$sqlSmartphones = "SELECT * FROM smartphone";
-$smartphoneResult = $c->query($sqlSmartphones);
-$features = [];
-while ($smartphone = $smartphoneResult->fetch(PDO::FETCH_ASSOC)) {
-    $smartphoneId = $smartphone['Id_smartphone'];
-
-    if (array_key_exists($smartphoneId, $features)) {
-        $valueSmartphoneFeatures = $features[$smartphoneId];
-        $idSmartphone = $smartphone['Id_smartphone'];
-
-        $sqlInsert = "INSERT INTO smartphone_features (Value_Smartphone_Features, Id_smartphone, Id_Features) 
-            VALUES (:valueSmartphoneFeatures, :idSmartphone, :idFeatures)";
-
-        $stmt = $c->prepare($sqlInsert);
-        $stmt->bindParam(':valueSmartphoneFeatures', $valueSmartphoneFeatures);
-        $stmt->bindParam(':idSmartphone', $idSmartphone);
-        $stmt->bindParam(':idFeatures', $feature_id); 
-
-        $stmt->execute();
-    }
+    $sqlr2 = "SELECT * FROM smartphone";
+    $phones = $c->query($sqlr2);
+    $ids = [];
+    while ($row = $phones->fetch(PDO::FETCH_ASSOC)) {
+        array_push($ids, $row["Id_smartphone"]);
+        
+    };
+    
+    for ($i = 0; $i < (int)$smartphoneCount; $i++) {
+        
+        $smartphoneId = $ids[$i];
+            $valueSmartphoneFeatures = $features[$smartphoneId];
+    
+            $sqlInsert = "INSERT INTO smartphone_features (Value_Smartphone_Features, Id_smartphone, Id_Features) 
+                VALUES (:valueSmartphoneFeatures, :smartphoneId, :idFeatures)";
+    
+            $stmt = $c->prepare($sqlInsert);
+            $stmt->bindParam(':valueSmartphoneFeatures', $valueSmartphoneFeatures);
+            $stmt->bindParam(':smartphoneId', $smartphoneId);
+            $stmt->bindParam(':idFeatures', $feature_id); 
+    
+            $stmt->execute();
+        }
 }
+echo ' <input type="submit" value="Submit" >';
+    echo '</form>';
+
 
 
 
