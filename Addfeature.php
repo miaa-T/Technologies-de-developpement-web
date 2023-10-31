@@ -52,7 +52,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $stmt->execute();
         }
 
-        echo 'Feature added successfully!';
+        echo 'feature ajoutée avec succé';
     } 
 }
 echo ' <input type="submit" value="Submit" >';
