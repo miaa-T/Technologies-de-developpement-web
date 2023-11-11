@@ -79,16 +79,8 @@
                 $.post('delete_smartphone.php', {id: phoneID});
             }
         }
-    function editFeature(featureId) {
-        if (confirm('sure?')) {
-            $.post('modifier_feature.php', {id: featureId});
-        }
-    }
-    function editSmartphone(phoneID) {
-        if (confirm('sure?')) {
-            $.post('modifier_phone.php', {id: phoneID});
-        }
-    }
+
+ 
 
 </script>
 <?php
@@ -131,14 +123,15 @@ foreach ($features as $feature) {
             echo "<td></td>";
         }
     }
-    echo '<td><button onclick="editFeature(' . $feature['Id_Features'] . ')">Modifier</button></td>';
+    echo '<td><a href="modifier_feature.php?feature_id=' . $feature['Id_Features'] . '"><button>Modifier</button></a></td>';
+
     echo '<td><button onclick="deleteFeature(' . $feature['Id_Features'] . ')">Supprimer</button></td>';
     echo '</tr>';
 }
 echo '<tr>';
 echo '<td></td>';
 foreach ($smartphones as $smartphone) {
-    echo '<td><button onclick="editSmartphone(' . $smartphone['Id_smartphone'] . ')">Modifier</button></td>';
+    echo '<td><a href="modifier_phone.php?phone_id=' . $smartphone['Id_smartphone'] . '"><button>Modifier</button></a></td>';
 }
 echo '</tr>';
 
