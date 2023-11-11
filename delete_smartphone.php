@@ -16,6 +16,7 @@ if (isset($_POST['id'])) {
     $deletePhone->execute();
 
     echo "suppression avec succes";
+
 } else {
     echo "echec";
 }
